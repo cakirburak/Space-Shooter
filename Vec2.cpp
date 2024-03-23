@@ -1,6 +1,4 @@
 #include "Vec2.hpp"
-#include <cmath>
-#include <iostream>
 
 Vec2::Vec2(){}
 
@@ -56,7 +54,26 @@ void Vec2::operator /= (const float val)
   x /= val; y /= val;
 }
 
-float Vec2::dist(const Vec2& vec) const
+Vec2& Vec2::distVec(const Vec2& vec)
+{
+  *this -= vec;
+  *this *= -1;
+  return *this;
+}
+
+Vec2& Vec2::normalize()
+{
+  *this /= this->length();
+  return *this;
+}
+
+Vec2& Vec2::scale(const float val)
+{
+  x *= val; y *= val;
+  return *this;
+}
+
+float Vec2::distLen(const Vec2& vec) const
 {
   return sqrt( (vec.x - x) * (vec.x - x) + (vec.y - y) * (vec.y - y) );
 }

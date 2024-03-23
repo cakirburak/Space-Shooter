@@ -1,5 +1,7 @@
 #ifndef VEC2_HPP
 #define VEC2_HPP
+#include <cmath>
+#include <iostream>
 
 class Vec2
 {
@@ -23,8 +25,13 @@ public:
   void operator *= (const float val);
   void operator /= (const float val);
 
-  float dist(const Vec2& rhs) const;
+  Vec2& distVec(const Vec2& vec);
+  Vec2& normalize();
+  Vec2& scale(const float val);
+
+  float distLen(const Vec2& vec) const;
   float length() const;
+
   void print() const;
 
 };

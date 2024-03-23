@@ -9,4 +9,4 @@
 #
 # my_class.o: my_class.cpp
 all:
-	g++ -std=c++17 --debug main.cpp Vec2.cpp -o main.out
+	g++ -std=c++17 -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio --debug *.cpp -o sfml-app
