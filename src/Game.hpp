@@ -5,10 +5,15 @@
 #include "Vec2.hpp"
 #include <SFML/Graphics.hpp>
 #include <memory>
+#include <fstream>
+#include <cstdlib>
+#include <iostream>
 
-struct PlayerConfig {int SR, CR, FR, FG, FB, OR, OG, OB, OT, V; float S; };
-struct EnemyConfig  {int SR, CR, OR, OG, OB, OT, VMIN, VMAX, L, SI; float SMIN, SMAX; };
-struct BulletConfig {int SR, CR, FR, FG, FB, OR, OG, OB, OT, V, L; float S; };
+struct WindowConfig { int WW, WH, FR, IFS; };
+struct PlayerConfig { int SR, CR, FR, FG, FB, OR, OG, OB, OT, V; float S; };
+struct EnemyConfig  { int SR, CR, OR, OG, OB, OT, VMIN, VMAX, L, SI; float SMIN, SMAX; };
+struct BulletConfig { int SR, CR, FR, FG, FB, OR, OG, OB, OT, V, L; float S; };
+struct FontConfig   { std::string FILE; int FS, FR, FG, FB; };
 
 class Game
 {
@@ -16,6 +21,8 @@ class Game
   EntityManager       m_entities;
   sf::Font            m_font;
   sf::Text            m_text;
+  WindowConfig        m_windowConfig;
+  FontConfig          m_fontConfig;
   PlayerConfig        m_playerConfig;
   EnemyConfig         m_enemyConfig;
   BulletConfig        m_bulletConfig;
