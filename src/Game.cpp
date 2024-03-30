@@ -1,6 +1,4 @@
 #include "Game.hpp"
-#include <cstring>
-#include <string>
 
 Game::Game(const std::string& config)
 {
@@ -50,12 +48,16 @@ void Game::init(const std::string& config)
     {
       std::cout << temp << "\n";
     }
+
   }
 
   m_window.create(sf::VideoMode(m_windowConfig.WW, m_windowConfig.WH), "Space Shooter");
   m_window.setFramerateLimit(m_windowConfig.FR);
 
-  m_font.loadFromFile(m_fontConfig.FILE);
+  if(!m_font.loadFromFile(m_fontConfig.FILE))
+  {
+    std::cerr << "Could not load specified Font!" << "\n";
+  }
 
   spawnPlayer();
 
@@ -66,14 +68,6 @@ void Game::run()
 
   while(m_running)
   {
-    sf::Event event;
-    while (m_window.pollEvent(event))
-    {
-      if (event.type == sf::Event::Closed){
-        m_window.close();
-        m_running = false;
-      }
-    }
 
     m_entities.update();
 
@@ -95,7 +89,71 @@ void Game::setPaused(bool paused)
 void Game::sMovement()
 {
 
+  playerMovement();
 }
+
+void Game::playerMovement()
+{
+  m_player->cTransform->velocity = {0, 0};
+
+  if(m_player->cTransform->pos.x < m_playerConfig.SR + m_playerConfig.OT)
+    m_player->cInput->left = false;
+  if(m_player->cTransform->pos.x + m_playerConfig.SR + m_playerConfig.OT > m_windowConfig.WW)
+    m_player->cInput->right = false;
+  if(m_player->cTransform->pos.y < m_playerConfig.SR + m_playerConfig.OT)
+    m_player->cInput->up = false;
+  if(m_player->cTransform->pos.y + m_playerConfig.SR + m_playerConfig.OT > m_windowConfig.WH)
+    m_player->cInput->down = false;
+
+  if(m_player->cInput->up && m_player->cInput->right)
+  {
+    Vec2 velocityVec(m_playerConfig.S, -m_playerConfig.S);
+    velocityVec.normalize().scale(m_playerConfig.S);
+    m_player->cTransform->velocity = velocityVec;
+  }
+  else if(m_player->cInput->up && m_player->cInput->left)
+  {
+    Vec2 velocityVec(-m_playerConfig.S, -m_playerConfig.S);
+    velocityVec.normalize().scale(m_playerConfig.S);
+    m_player->cTransform->velocity = velocityVec;
+  }
+  else if(m_player->cInput->down && m_player->cInput->right)
+  {
+    Vec2 velocityVec(m_playerConfig.S, m_playerConfig.S);
+    velocityVec.normalize().scale(m_playerConfig.S);
+    m_player->cTransform->velocity = velocityVec;
+  }
+  else if(m_player->cInput->down && m_player->cInput->left)
+  {
+    Vec2 velocityVec(-m_playerConfig.S, m_playerConfig.S);
+    velocityVec.normalize().scale(m_playerConfig.S);
+    m_player->cTransform->velocity = velocityVec;
+  }
+  else
+  {
+    if(m_player->cInput->up)
+    {
+      m_player->cTransform->velocity.y = -m_playerConfig.S;
+    }
+    else if(m_player->cInput->down)
+    {
+      m_player->cTransform->velocity.y = m_playerConfig.S;
+    }
+    else if(m_player->cInput->right)
+    {
+      m_player->cTransform->velocity.x = m_playerConfig.S;
+    }
+    else if(m_player->cInput->left)
+    {
+      m_player->cTransform->velocity.x = -m_playerConfig.S;
+    }
+  }
+
+  m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
+  m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
+}
+
+
 
 void Game::sCollision()
 {}
@@ -117,7 +175,69 @@ void Game::sRender()
 }
 
 void Game::sUserInput()
-{}
+{
+  sf::Event event;
+  while (m_window.pollEvent(event))
+  {
+    if (event.type == sf::Event::Closed){
+      m_running = false;
+    }
+
+    if(event.type == sf::Event::KeyPressed)
+    {
+      switch (event.key.code)
+      {
+        case sf::Keyboard::W:
+          m_player->cInput->up = true;
+          break;
+        case sf::Keyboard::S:
+          m_player->cInput->down = true;
+          break;
+        case sf::Keyboard::A:
+          m_player->cInput->left = true;
+          break;
+        case sf::Keyboard::D:
+          m_player->cInput->right = true;
+          break;
+        default: break;
+      }
+    }
+
+    if(event.type == sf::Event::KeyReleased)
+    {
+      switch (event.key.code)
+      {
+        case sf::Keyboard::W:
+          m_player->cInput->up = false;
+          break;
+        case sf::Keyboard::S:
+          m_player->cInput->down = false;
+          break;
+        case sf::Keyboard::A:
+          m_player->cInput->left = false;
+          break;
+        case sf::Keyboard::D:
+          m_player->cInput->right = false;
+          break;
+        default: break;
+      }
+    }
+
+    if(event.type == sf::Event::MouseButtonPressed)
+    {
+      if(event.mouseButton.button == sf::Mouse::Left)
+      {
+        std::cout << "Left Mouse Button Clicked at ("
+                  << event.mouseButton.x << "," << event.mouseButton.y << ")\n";
+      }
+      if(event.mouseButton.button == sf::Mouse::Right)
+      {
+        std::cout << "Right Mouse Button Clicked at ("
+                  << event.mouseButton.x << "," << event.mouseButton.y << ")\n";
+      }
+    }
+  }
+}
 
 void Game::sLifespan()
 {}
@@ -151,14 +271,13 @@ void Game::spawnPlayer()
 void Game::spawnEnemy()
 {
   auto entity = m_entities.addEntity("enemy");
-  float enemyPosX = m_enemyConfig.SR*2 + ( rand() % (1 + m_windowConfig.WW - m_enemyConfig.SR*2));
-  float enemyPosY = m_enemyConfig.SR*2 + ( rand() % (1 + m_windowConfig.WH - m_enemyConfig.SR*2));
+  float enemyPosX = m_enemyConfig.SR + ( rand() % (1 + m_windowConfig.WW - m_enemyConfig.SR*2));
+  float enemyPosY = m_enemyConfig.SR + ( rand() % (1 + m_windowConfig.WH - m_enemyConfig.SR*2));
   entity->cTransform = std::make_shared<CTransform>(Vec2(enemyPosX,enemyPosY),
                                                     Vec2(0,0),
                                                     0);
 
   int numOfV = m_enemyConfig.VMIN + ( rand() % (1 + m_enemyConfig.VMAX - m_enemyConfig.VMIN));
-  std::cout << numOfV << std::endl;
   int r, g, b;
   r = rand() % (1 + 255);
   g = rand() % (1 + 255);

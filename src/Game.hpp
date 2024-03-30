@@ -5,9 +5,10 @@
 #include "Vec2.hpp"
 #include <SFML/Graphics.hpp>
 #include <memory>
-#include <fstream>
-#include <cstdlib>
 #include <iostream>
+#include <fstream>
+// #include <cstdlib>
+// #include <string>
 
 struct WindowConfig { int WW, WH, FR, IFS; };
 struct PlayerConfig { int SR, CR, FR, FG, FB, OR, OG, OB, OT, V; float S; };
@@ -38,6 +39,9 @@ class Game
   void setPaused(bool paused);
 
   void sMovement();
+  void playerMovement();
+  void EnemyMovement();
+
   void sUserInput();
   void sLifespan();
   void sRender();
