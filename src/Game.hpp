@@ -7,8 +7,6 @@
 #include <memory>
 #include <iostream>
 #include <fstream>
-// #include <cstdlib>
-// #include <string>
 
 struct WindowConfig { int WW, WH, FR, IFS; };
 struct PlayerConfig { int SR, CR, FR, FG, FB, OR, OG, OB, OT, V; float S; };
@@ -40,7 +38,8 @@ class Game
 
   void sMovement();
   void playerMovement();
-  void EnemyMovement();
+  void enemyMovement();
+  void bulletMovement();
 
   void sUserInput();
   void sLifespan();

@@ -11,12 +11,14 @@ public:
 
   Vec2();
   Vec2(float xin, float yin);
+  Vec2(float angle);
 
   bool operator == (const Vec2& rhs) const;
   bool operator != (const Vec2& rhs) const;
 
   Vec2 operator +  (const Vec2& rhs) const;
   Vec2 operator -  (const Vec2& rhs) const;
+  Vec2 operator *  (const Vec2& val) const;
   Vec2 operator *  (const float val) const;
   Vec2 operator /  (const float val) const;
 
